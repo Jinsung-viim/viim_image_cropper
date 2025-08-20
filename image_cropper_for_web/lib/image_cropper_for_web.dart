@@ -18,6 +18,8 @@ import 'src/interop/cropper_interop.dart';
 ///
 /// This class implements the `package:image_picker` functionality for the web.
 class ImageCropperPlugin extends ImageCropperPlatform {
+  static Cropper? _cropper; // Web Cropper.js 인스턴스 캐싱
+  
   /// Registers this class as the default instance of [ImageCropperPlatform].
   static void registerWith(Registrar registrar) {
     ImageCropperPlatform.instance = ImageCropperPlugin();
@@ -25,33 +27,6 @@ class ImageCropperPlugin extends ImageCropperPlatform {
 
   static int _nextIFrameId = 0;
 
-  ///
-  /// Launch cropper UI for an image.
-  ///
-  ///
-  /// **parameters:**
-  ///
-  /// * sourcePath: the absolute path of an image file.
-  ///
-  /// * maxWidth: maximum cropped image width.
-  ///
-  /// * maxHeight: maximum cropped image height.
-  ///
-  /// * aspectRatio: controls the aspect ratio of crop bounds. If this values is set,
-  /// the cropper is locked and user can't change the aspect ratio of crop bounds.
-  ///
-  /// * compressFormat: the format of result image, png or jpg
-  ///
-  /// * compressQuality: the value [0 - 100] to control the quality of image compression (IGNORED)
-  ///
-  /// * uiSettings: controls UI customization on specific platform (android, ios, web,...).
-  /// This field is required and must provide [WebUiSettings]
-  ///
-  /// **return:**
-  ///
-  /// A result file of the cropped image.
-  ///
-  ///
   @override
   Future<CroppedFile?> cropImage({
     required String sourcePath,
@@ -118,12 +93,12 @@ class ImageCropperPlugin extends ImageCropperPlatform {
       minCropBoxWidth: webSettings.minCropBoxWidth ?? 0,
       minCropBoxHeight: webSettings.minCropBoxHeight ?? 0,
     );
-    Cropper? cropper;
+    // Cropper? cropper;
     initializer() => Future.delayed(
           const Duration(milliseconds: 200),
           () {
-            assert(cropper == null, 'cropper was already initialized');
-            cropper = Cropper(image, options);
+            assert(_cropper == null, 'cropper was already initialized');
+            _cropper = Cropper(image, options);
           },
         );
 
@@ -245,6 +220,13 @@ class ImageCropperPlugin extends ImageCropperPlatform {
     }
   }
 
+  Future<void> setAspectRatio(double ratio) async {
+    if (_cropper == null) {
+      throw 'Cropper not initialized yet';
+    }
+    _cropper!.setAspectRatio(ratio);
+  }
+  
   ///
   /// Not applicable on web, see Android implementation.
   ///
