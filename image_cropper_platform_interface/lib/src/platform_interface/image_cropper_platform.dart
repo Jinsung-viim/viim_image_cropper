@@ -115,6 +115,11 @@ abstract class ImageCropperPlatform extends PlatformInterface {
   /// * [Android Activity Lifecycle](https://developer.android.com/reference/android/app/Activity.html)
   ///
   ///
+
+  Future<void> setAspectRatio(double ratio) {
+    throw UnimplementedError('setAspectRatio() has not been implemented.');
+  }
+  
   Future<CroppedFile?> recoverImage() {
     throw UnimplementedError('recoverImage() has not been implemented.');
   }
