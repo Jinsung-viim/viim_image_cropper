@@ -2,8 +2,6 @@ library image_cropper_for_web;
 
 import 'dart:async';
 import 'dart:js_interop';
-
-import 'package:web/web.dart' as web;
 import 'dart:ui_web' as ui;
 
 import 'package:flutter/material.dart';
@@ -11,6 +9,7 @@ import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 import 'package:image_cropper_for_web/src/cropper_dialog.dart';
 import 'package:image_cropper_for_web/src/cropper_page.dart';
 import 'package:image_cropper_platform_interface/image_cropper_platform_interface.dart';
+import 'package:web/web.dart' as web;
 
 import 'src/interop/cropper_interop.dart';
 
@@ -19,7 +18,7 @@ import 'src/interop/cropper_interop.dart';
 /// This class implements the `package:image_picker` functionality for the web.
 class ImageCropperPlugin extends ImageCropperPlatform {
   static Cropper? _cropper; // Web Cropper.js 인스턴스 캐싱
-  
+
   /// Registers this class as the default instance of [ImageCropperPlatform].
   static void registerWith(Registrar registrar) {
     ImageCropperPlatform.instance = ImageCropperPlugin();
@@ -64,13 +63,10 @@ class ImageCropperPlugin extends ImageCropperPlatform {
     div.appendChild(image);
 
     final options = CropperOptions(
-      dragMode:
-          webSettings.dragMode != null ? webSettings.dragMode!.value : 'crop',
-      viewMode:
-          webSettings.viewwMode != null ? webSettings.viewwMode!.value : 0,
+      dragMode: webSettings.dragMode != null ? webSettings.dragMode!.value : 'crop',
+      viewMode: webSettings.viewwMode != null ? webSettings.viewwMode!.value : 0,
       initialAspectRatio: webSettings.initialAspectRatio,
-      aspectRatio:
-          aspectRatio != null ? aspectRatio.ratioX / aspectRatio.ratioY : null,
+      aspectRatio: aspectRatio != null ? aspectRatio.ratioX / aspectRatio.ratioY : null,
       checkCrossOrigin: webSettings.checkCrossOrigin ?? true,
       checkOrientation: webSettings.checkOrientation ?? true,
       modal: webSettings.modal ?? true,
@@ -97,13 +93,12 @@ class ImageCropperPlugin extends ImageCropperPlatform {
     initializer() => Future.delayed(
           const Duration(milliseconds: 200),
           () {
-            assert(_cropper == null, 'cropper was already initialized');
+            // assert(_cropper == null, 'cropper was already initialized');
             _cropper = Cropper(image, options);
           },
         );
 
-    final viewType =
-        'plugins.hunghd.vn/cropper-view-${Uri.encodeComponent(sourcePath)}';
+    final viewType = 'plugins.hunghd.vn/cropper-view-${Uri.encodeComponent(sourcePath)}';
 
     ui.platformViewRegistry.registerViewFactory(viewType, (int viewId) => div);
 
@@ -113,10 +108,8 @@ class ImageCropperPlugin extends ImageCropperPlatform {
     );
 
     Future<String?> doCrop() async {
-      if (cropper != null) {
-        final croppedOptions = (maxWidth != null ||
-                maxHeight != null ||
-                compressFormat == ImageCompressFormat.jpg)
+      if (_cropper != null) {
+        final croppedOptions = (maxWidth != null || maxHeight != null || compressFormat == ImageCompressFormat.jpg)
             ? GetCroppedCanvasOptions()
             : null;
         if (maxWidth != null) {
@@ -128,33 +121,32 @@ class ImageCropperPlugin extends ImageCropperPlatform {
         if (compressFormat == ImageCompressFormat.jpg) {
           croppedOptions!.fillColor = '#fff';
         }
-        final result = croppedOptions != null
-            ? cropper!.getCroppedCanvas(croppedOptions)
-            : cropper!.getCroppedCanvas();
+        final result =
+            croppedOptions != null ? _cropper!.getCroppedCanvas(croppedOptions) : _cropper!.getCroppedCanvas();
         final completer = Completer<String>();
-        final mimeType = compressFormat == ImageCompressFormat.png
-            ? 'image/png'
-            : 'image/jpeg';
+        final mimeType = compressFormat == ImageCompressFormat.png ? 'image/png' : 'image/jpeg';
         result.toBlob(
           (web.Blob blob) {
             completer.complete(web.URL.createObjectURL(blob));
           }.toJS,
           mimeType,
         );
-        return completer.future;
+        final url = await completer.future;
+        _cropper = null; // 크랍 작업 후 인스턴스 해제
+        return url;
       } else {
         return Future.error('cropper has not been initialized');
       }
     }
 
     void doRotate(RotationAngle angle) {
-      if (cropper == null) throw 'cropper has not been initialized';
-      cropper?.rotate(rotationAngleToNumber(angle));
+      if (_cropper == null) throw 'cropper has not been initialized';
+      _cropper?.rotate(rotationAngleToNumber(angle));
     }
 
     void doScale(num value) {
-      if (cropper == null) throw 'cropper has not been initialized';
-      cropper?.scale(value);
+      if (_cropper == null) throw 'cropper has not been initialized';
+      _cropper?.scale(value);
     }
 
     if (webSettings.presentStyle == WebPresentStyle.page) {
@@ -177,8 +169,7 @@ class ImageCropperPlugin extends ImageCropperPlatform {
             scale: doScale,
             cropperContainerWidth: cropperWidth * 1.0,
             cropperContainerHeight: cropperHeight * 1.0,
-            translations:
-                webSettings?.translations ?? const WebTranslations.en(),
+            translations: webSettings?.translations ?? const WebTranslations.en(),
             themeData: webSettings?.themeData,
           ),
         );
@@ -220,18 +211,16 @@ class ImageCropperPlugin extends ImageCropperPlatform {
     }
   }
 
+  @override
+  Future<CroppedFile?> recoverImage() async {
+    return null;
+  }
+
+  @override
   Future<void> setAspectRatio(double ratio) async {
     if (_cropper == null) {
       throw 'Cropper not initialized yet';
     }
     _cropper!.setAspectRatio(ratio);
-  }
-  
-  ///
-  /// Not applicable on web, see Android implementation.
-  ///
-  @override
-  Future<CroppedFile?> recoverImage() async {
-    return null;
   }
 }
