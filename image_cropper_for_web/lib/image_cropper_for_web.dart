@@ -20,9 +20,9 @@ class ImageCropperPlugin extends ImageCropperPlatform {
   static Cropper? _cropper; // Web Cropper.js 인스턴스 캐싱
 
   /// Registers this class as the default instance of [ImageCropperPlatform].
-  // static void registerWith(Registrar registrar) {
-  //   ImageCropperPlatform.instance = ImageCropperPlugin();
-  // }
+  static void registerWith(Registrar registrar) {
+    ImageCropperPlatform.instance = ImageCropperPlugin();
+  }
 
   static int _nextIFrameId = 0;
 
