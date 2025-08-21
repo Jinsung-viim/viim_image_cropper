@@ -119,7 +119,7 @@ class ImageCropperPlugin extends ImageCropperPlatform {
     ui.platformViewRegistry.registerViewFactory(viewType, (int viewId) => div);
 
     final cropperWidget = HtmlElementView(
-      key: ValueKey(sourcePath),
+      // key: ValueKey(sourcePath),
       viewType: viewType,
     );
 
