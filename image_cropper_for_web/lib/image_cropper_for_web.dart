@@ -99,35 +99,20 @@ class ImageCropperPlugin extends ImageCropperPlatform {
         //   },
         // );
     
-    // initializer() => Future<void>(() async {
-    //   final completer = Completer<void>();
-    //   image.onLoad.listen((_) {
-    //     _cropper = Cropper(image, options);
-    //     completer.complete();
-    //   });
-    //   // 만약 이미지가 이미 로드된 상태라면 바로 complete
-    //   if (image.complete ?? false) {
-    //     _cropper = Cropper(image, options);
-    //     completer.complete();
-    //   }
-    //   return completer.future;
-    // });
-
-    Future<void> initializer() {
+    initializer() => Future<void>(() async {
       final completer = Completer<void>();
-      void completeIfNeeded() {
-        if (!completer.isCompleted) {
-          _cropper = Cropper(image, options);
-          completer.complete();
-        }
-      }
-      if (image.complete ?? false) {
-        completeIfNeeded();
-      } else {
-        image.onLoad.listen((_) => completeIfNeeded());
-      }
-    return completer.future;
-    }
+      image.onLoad.listen((_) {
+        _cropper = Cropper(image, options);
+        completer.complete();
+      });
+      // 만약 이미지가 이미 로드된 상태라면 바로 complete
+      // if (image.complete ?? false) {
+      //   _cropper = Cropper(image, options);
+      //   completer.complete();
+      // }
+      return completer.future;
+    });
+
     
     final viewType = 'plugins.hunghd.vn/cropper-view-${Uri.encodeComponent(sourcePath)}';
 
@@ -237,7 +222,7 @@ class ImageCropperPlugin extends ImageCropperPlatform {
         barrierDismissible: false,
         builder: (_) => cropperDialog,
       );
-
+      _cropper = null; // 끝났으면 비움
       return result != null ? CroppedFile(result) : null;
     }
   }
