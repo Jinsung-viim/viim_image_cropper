@@ -30,10 +30,10 @@ abstract class ImageCropperPlatform extends PlatformInterface {
 
   /// Platform-specific plugins should set this with their own platform-specific
   /// class that extends [ImageCropperPlatform] when they register themselves.
-  static set instance(ImageCropperPlatform instance) {
-    PlatformInterface.verify(instance, _token);
-    _instance = instance;
-  }
+  // static set instance(ImageCropperPlatform instance) {
+  //   PlatformInterface.verify(instance, _token);
+  //   _instance = instance;
+  // }
 
   ///
   /// Launch cropper UI for an image.
