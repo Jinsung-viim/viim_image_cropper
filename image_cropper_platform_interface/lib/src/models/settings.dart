@@ -427,7 +427,7 @@ class IOSUiSettings extends PlatformUiSettings {
 
 typedef WebDialogBuilder = Widget Function(
   Widget cropper,
-  void Function() initCropper,
+  Future<void> Function() initCropper,
   Future<String?> Function() crop,
   void Function(RotationAngle) rotate,
   void Function(num) scale,
@@ -435,7 +435,7 @@ typedef WebDialogBuilder = Widget Function(
 
 typedef WebRouteBuilder = PageRoute<String> Function(
   Widget cropper,
-  void Function() initCropper,
+  Future<void> Function() initCropper,
   Future<String?> Function() crop,
   void Function(RotationAngle) rotate,
   void Function(num) scale,
