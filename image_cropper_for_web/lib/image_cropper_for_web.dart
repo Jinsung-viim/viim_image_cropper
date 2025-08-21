@@ -89,15 +89,30 @@ class ImageCropperPlugin extends ImageCropperPlatform {
       minCropBoxWidth: webSettings.minCropBoxWidth ?? 0,
       minCropBoxHeight: webSettings.minCropBoxHeight ?? 0,
     );
+    
     // Cropper? cropper;
-    initializer() => Future.delayed(
-          const Duration(milliseconds: 0),
-          () {
+    // initializer() => Future.delayed(
+    //       const Duration(milliseconds: 0),
+    //       () {
             // assert(_cropper == null, 'cropper was already initialized');
-            _cropper = Cropper(image, options);
-          },
-        );
-
+        //     _cropper = Cropper(image, options);
+        //   },
+        // );
+    
+    initializer() => Future<void>(() async {
+      final completer = Completer<void>();
+      image.onLoad.listen((_) {
+        _cropper = Cropper(image, options);
+        completer.complete();
+      });
+      // 만약 이미지가 이미 로드된 상태라면 바로 complete
+      if (image.complete ?? false) {
+        _cropper = Cropper(image, options);
+        completer.complete();
+      }
+      return completer.future;
+    });
+    
     final viewType = 'plugins.hunghd.vn/cropper-view-${Uri.encodeComponent(sourcePath)}';
 
     ui.platformViewRegistry.registerViewFactory(viewType, (int viewId) => div);
