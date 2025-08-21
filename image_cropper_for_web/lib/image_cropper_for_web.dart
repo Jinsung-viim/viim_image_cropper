@@ -91,7 +91,7 @@ class ImageCropperPlugin extends ImageCropperPlatform {
     );
     // Cropper? cropper;
     initializer() => Future.delayed(
-          const Duration(milliseconds: 200),
+          const Duration(milliseconds: 0),
           () {
             // assert(_cropper == null, 'cropper was already initialized');
             _cropper = Cropper(image, options);
