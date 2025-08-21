@@ -20,12 +20,13 @@ abstract class ImageCropperPlatform extends PlatformInterface {
 
   static final Object _token = Object();
 
-  static ImageCropperPlatform _instance = MethodChannelImageCropper();
+  // static ImageCropperPlatform _instance = MethodChannelImageCropper();
 
   /// The default instance of [ImageCropperPlatform] to use.
   ///
   /// Defaults to [MethodChannelImageCropper].
-  static ImageCropperPlatform get instance => _instance;
+  // static ImageCropperPlatform get instance => _instance;
+  static ImageCropperPlatform get instance => MethodChannelImageCropper();
 
   /// Platform-specific plugins should set this with their own platform-specific
   /// class that extends [ImageCropperPlatform] when they register themselves.
