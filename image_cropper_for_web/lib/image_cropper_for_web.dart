@@ -106,10 +106,10 @@ class ImageCropperPlugin extends ImageCropperPlatform {
         completer.complete();
       });
       // 만약 이미지가 이미 로드된 상태라면 바로 complete
-      if (image.complete ?? false) {
-        _cropper = Cropper(image, options);
-        completer.complete();
-      }
+      // if (image.complete ?? false) {
+      //   _cropper = Cropper(image, options);
+      //   completer.complete();
+      // }
       return completer.future;
     });
     
